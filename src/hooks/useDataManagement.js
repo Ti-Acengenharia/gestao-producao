@@ -6,8 +6,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { uid } from '../utils/uid';
 import { readJSON, writeJSON, STORAGE_KEYS } from '../services/storageService';
 import { employeesAPI, agreementsAPI, productionAPI } from '../services/apiService';
-import { DEFAULT_SERVICES } from '../constants/defaultServices';
-import { DEFAULT_EMPLOYEES } from '../constants/defaultEmployees';
 
 export const useDataManagement = () => {
   const [loading, setLoading] = useState(true);
@@ -27,21 +25,7 @@ export const useDataManagement = () => {
         if (apiAgreements && apiAgreements.length > 0) {
           setAgreements(apiAgreements.sort((a, b) => a.name.localeCompare(b.name)));
         } else {
-          // Se não houver dados no banco, fazer seed
-          console.log('Nenhum acordo encontrado, fazendo seed inicial...');
-          const seededAgreements = await Promise.all(
-            DEFAULT_SERVICES.map(async (s) => {
-              const agreementData = {
-                id: uid(),
-                name: s.name,
-                unit: s.unit,
-                price: Number(s.price) || 0,
-                createdAt: Date.now(),
-              };
-              return await agreementsAPI.create(agreementData);
-            })
-          );
-          setAgreements(seededAgreements.sort((a, b) => a.name.localeCompare(b.name)));
+          setAgreements([]);
         }
       } catch (error) {
         console.error('Erro ao carregar acordos da API:', error);
@@ -58,24 +42,7 @@ export const useDataManagement = () => {
         if (apiEmployees && apiEmployees.length > 0) {
           setEmployees(apiEmployees.sort((a, b) => a.name.localeCompare(b.name)));
         } else {
-          // Se não houver dados no banco, fazer seed
-          console.log('Nenhum colaborador encontrado, fazendo seed inicial...');
-          const seededEmployees = await Promise.all(
-            DEFAULT_EMPLOYEES.map(async (e) => {
-              const employeeData = {
-                id: uid(),
-                name: e.name,
-                role: e.role,
-                cpf: e.cpf || '',
-                agency: e.agency || '',
-                operation: e.operation || '',
-                account: e.account || '',
-                createdAt: Date.now(),
-              };
-              return await employeesAPI.create(employeeData);
-            })
-          );
-          setEmployees(seededEmployees.sort((a, b) => a.name.localeCompare(b.name)));
+          setEmployees([]);
         }
       } catch (error) {
         console.error('Erro ao carregar colaboradores da API:', error);
