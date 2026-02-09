@@ -1,0 +1,11 @@
+# Banco de dados
+data/
+
+# Env
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
