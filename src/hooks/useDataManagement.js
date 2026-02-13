@@ -102,8 +102,8 @@ export const useDataManagement = () => {
 
     setIsSubmitting(true);
     try {
-      const qtd = Number(entry.quantity);
-      if (!Number.isFinite(qtd) || qtd <= 0) return;
+      const qtd = parseInt(entry.quantity, 10);
+      if (!Number.isInteger(qtd) || qtd <= 0) return;
 
       const unitPrice = Number(selectedAgreement.price) || 0;
       const total = qtd * unitPrice;
@@ -229,6 +229,36 @@ export const useDataManagement = () => {
     }
   };
 
+  const updateEmployee = async (id, employeeData) => {
+    if (!id || !employeeData.name || !employeeData.role) return;
+
+    setIsSubmitting(true);
+    try {
+      const updatedEmployee = {
+        id,
+        name: employeeData.name.trim(),
+        role: employeeData.role.trim(),
+        cpf: employeeData.cpf || '',
+        agency: employeeData.agency || '',
+        operation: employeeData.operation || '',
+        account: employeeData.account || '',
+      };
+
+      const saved = await employeesAPI.update(id, updatedEmployee);
+
+      setEmployees((prev) =>
+        prev
+          .map((emp) => (emp.id === id ? saved : emp))
+          .sort((a, b) => a.name.localeCompare(b.name))
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar colaborador:', error);
+      alert('Erro ao atualizar colaborador. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const deleteEmployee = async (id) => {
     if (!confirm('Tem a certeza?')) return;
 
@@ -255,6 +285,7 @@ export const useDataManagement = () => {
     addAgreement,
     deleteAgreement,
     addEmployee,
+    updateEmployee,
     deleteEmployee,
   };
 };

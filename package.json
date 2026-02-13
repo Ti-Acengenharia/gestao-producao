@@ -1,18 +1,85 @@
 {
   "name": "gestao-obras",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
+  "author": "Gestão de Obras",
+  "description": "Sistema de Gestão de Obras - Aplicação Desktop",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server/server.js",
-    "server:dev": "nodemon server/server.js"
+    "server:dev": "nodemon server/server.js",
+    "electron": "cross-env NODE_ENV=development electron .",
+    "electron:dev": "concurrently -n \"BACKEND,VITE,ELECTRON\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run server\" \"npm run dev\" \"wait-on http://localhost:3000/api/health http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "prebuild": "npm run rebuild",
+    "electron:build": "npm run build && electron-builder",
+    "electron:build:win": "npm run build && electron-builder --win",
+    "electron:build:win:clean": "npm run rebuild && npm run build && electron-builder --win",
+    "electron:build:mac": "npm run build && electron-builder --mac",
+    "electron:build:linux": "npm run build && electron-builder --linux",
+    "postinstall": "cd server && npm install",
+    "rebuild": "npm rebuild better-sqlite3",
+    "clean:cache": "node -e \"const fs=require('fs');const path=require('path');const dir=path.join(process.env.LOCALAPPDATA,'electron-builder','Cache');try{fs.rmSync(dir,{recursive:true,force:true});console.log('✅ Cache limpo!')}catch(e){console.log('ℹ️ Cache não encontrado')}\""
+  },
+  "build": {
+    "appId": "com.gestaoobras.app",
+    "productName": "Gestão de Obras",
+    "asar": false,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "!server/node_modules/**/*"
+    ],
+    "asarUnpack": [
+      "server/**/*",
+      "node_modules/better-sqlite3/**/*",
+      "node_modules/express/**/*",
+      "node_modules/cors/**/*",
+      "node_modules/body-parser/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "forceCodeSigning": false
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.business"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "Development"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
+    "body-parser": "^2.2.1",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
@@ -26,10 +93,15 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^40.4.0",
+    "electron-builder": "^26.7.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "wait-on": "^9.0.3"
   }
 }

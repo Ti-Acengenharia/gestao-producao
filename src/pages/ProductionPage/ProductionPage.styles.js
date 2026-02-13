@@ -189,3 +189,60 @@ export const WarningBox = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   font-size: 0.875rem;
 `;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+`;
+
+export const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  padding: ${({ theme }) => theme.spacing.lg};
+  width: 100%;
+  max-width: 720px;
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+`;
+
+export const EmployeeList = styled.div`
+  max-height: 360px;
+  overflow-y: auto;
+  margin-top: ${({ theme }) => theme.spacing.md};
+  border-top: 1px solid ${({ theme }) => theme.colors.slate[200]};
+`;
+
+export const EmployeeItem = styled.button`
+  width: 100%;
+  text-align: left;
+  padding: ${({ theme }) => theme.spacing.sm} 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.slate[100]};
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.slate[50]};
+  }
+`;
+
+export const EmployeeName = styled.p`
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.slate[800]};
+`;
+
+export const EmployeeMeta = styled.p`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.slate[500]};
+`;

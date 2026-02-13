@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, FileText, Printer } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Plus, FileText, Printer, Users, X } from 'lucide-react';
 import Card from '../../components/Card/Card';
 import Button from '../../components/Button/Button';
 import * as F from '../../components/Form/Form.styles';
@@ -24,11 +24,29 @@ const ProductionPage = ({
     date: new Date().toISOString().split('T')[0],
   });
 
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
+  const [employeeSearch, setEmployeeSearch] = useState('');
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onAddProduction(newEntry);
     setNewEntry({ ...newEntry, quantity: '' });
   };
+
+  const selectedEmployee = useMemo(
+    () => employees.find((emp) => emp.id === newEntry.employeeId) || null,
+    [employees, newEntry.employeeId]
+  );
+
+  const filteredEmployees = useMemo(() => {
+    if (!employeeSearch.trim()) return employees;
+    const q = employeeSearch.trim().toLowerCase();
+    return employees.filter((emp) =>
+      [emp.name, emp.role, emp.cpf, emp.account, emp.agency, emp.operation]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(q))
+    );
+  }, [employees, employeeSearch]);
 
   return (
     <S.Container>
@@ -60,13 +78,24 @@ const ProductionPage = ({
                 <F.Label>Quantidade</F.Label>
                 <F.Input
                   type="number"
-                  step="0.01"
+                  step="1"
                   required
-                  placeholder="0.00"
+                  placeholder="0"
                   value={newEntry.quantity}
-                  onChange={(e) =>
-                    setNewEntry({ ...newEntry, quantity: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    // Permitir campo vazio para o usuário apagar
+                    if (raw === '') {
+                      setNewEntry({ ...newEntry, quantity: '' });
+                      return;
+                    }
+
+                    // Aceitar apenas inteiros positivos
+                    const intValue = parseInt(raw, 10);
+                    if (Number.isNaN(intValue) || intValue < 0) return;
+
+                    setNewEntry({ ...newEntry, quantity: String(intValue) });
+                  }}
                 />
               </F.FormGroup>
             </F.FormGrid>
@@ -74,20 +103,18 @@ const ProductionPage = ({
             <F.FormGrid $cols={2}>
               <F.FormGroup>
                 <F.Label>Colaborador</F.Label>
-                <F.Select
-                  value={newEntry.employeeId}
-                  onChange={(e) =>
-                    setNewEntry({ ...newEntry, employeeId: e.target.value })
+                <F.Input
+                  type="text"
+                  placeholder="Selecione um colaborador"
+                  value={
+                    selectedEmployee
+                      ? `${selectedEmployee.name} (${selectedEmployee.role})`
+                      : ''
                   }
+                  onClick={() => setIsEmployeeModalOpen(true)}
+                  readOnly
                   required
-                >
-                  <option value="">Selecione...</option>
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.name} ({emp.role})
-                    </option>
-                  ))}
-                </F.Select>
+                />
               </F.FormGroup>
 
               <F.FormGroup>
@@ -171,6 +198,71 @@ const ProductionPage = ({
             </S.ProductionItem>
           ))}
         </S.ProductionList>
+      )}
+
+      {isEmployeeModalOpen && (
+        <S.ModalOverlay>
+          <S.ModalContent>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Users size={18} />
+                <span style={{ fontWeight: 600, fontSize: 14 }}>
+                  Selecionar colaborador
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEmployeeModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 4,
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <F.FormGroup style={{ marginBottom: 8 }}>
+              <F.Label>Pesquisar</F.Label>
+              <F.Input
+                type="text"
+                placeholder="Nome, função ou dados bancários..."
+                value={employeeSearch}
+                onChange={(e) => setEmployeeSearch(e.target.value)}
+              />
+            </F.FormGroup>
+
+            <S.EmployeeList>
+              {filteredEmployees.map((emp) => (
+                <S.EmployeeItem
+                  key={emp.id}
+                  type="button"
+                  onClick={() => {
+                    setNewEntry({ ...newEntry, employeeId: emp.id });
+                    setIsEmployeeModalOpen(false);
+                    setEmployeeSearch('');
+                  }}
+                >
+                  <S.EmployeeName>{emp.name}</S.EmployeeName>
+                  <S.EmployeeMeta>
+                    {emp.role}
+                    {emp.cpf ? ` • CPF: ${emp.cpf}` : ''}
+                    {emp.account ? ` • Conta: ${emp.account}` : ''}
+                  </S.EmployeeMeta>
+                </S.EmployeeItem>
+              ))}
+            </S.EmployeeList>
+          </S.ModalContent>
+        </S.ModalOverlay>
       )}
     </S.Container>
   );

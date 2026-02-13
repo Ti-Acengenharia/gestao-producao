@@ -5,9 +5,15 @@
 
 // URL da API - usa o hostname atual (funciona em localhost e rede local)
 const getApiBaseUrl = () => {
-  const hostname = window.location.hostname;
+  // Se estiver no Electron ou hostname vazio, usar localhost
+  const isElectron = window.electron?.isElectron || !window.location.hostname || window.location.protocol === 'file:';
+  const hostname = isElectron ? 'localhost' : window.location.hostname;
   const port = 3000;
-  return `http://${hostname}:${port}/api`;
+  const baseUrl = `http://${hostname}:${port}/api`;
+  
+  console.log('🔗 API Base URL:', baseUrl, '| Electron:', isElectron);
+  
+  return baseUrl;
 };
 
 const API_BASE_URL = getApiBaseUrl();

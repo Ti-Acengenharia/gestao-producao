@@ -6,6 +6,36 @@ export const Container = styled.div`
   gap: ${({ theme }) => theme.spacing.lg};
 `;
 
+export const HeaderRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.sm};
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: row;
+    align-items: center;
+  }
+`;
+
+export const SearchInput = styled.input`
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  border: 1px solid ${({ theme }) => theme.colors.slate[300]};
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.slate[800]};
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.slate[400]};
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.primary}33;
+  }
+`;
+
 export const ListCard = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.xl};
@@ -86,4 +116,23 @@ export const DeleteIconButton = styled.button`
   &:hover {
     color: ${({ theme }) => theme.colors.danger};
   }
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+`;
+
+export const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  padding: ${({ theme }) => theme.spacing.lg};
+  width: 100%;
+  max-width: 640px;
+  box-shadow: ${({ theme }) => theme.shadows.lg};
 `;

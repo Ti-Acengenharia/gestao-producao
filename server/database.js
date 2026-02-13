@@ -1,8 +1,42 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
-// Criar diretório de dados se não existir
-const dbPath = path.join(__dirname, 'data', 'gestao-obras.db');
+// Determinar caminho do banco de dados
+let dbPath;
+let dbDir;
+
+if (process.env.USER_DATA_PATH) {
+  // Em produção (app instalado), usar pasta de dados do usuário fornecida pelo Electron
+  dbDir = path.join(process.env.USER_DATA_PATH, 'data');
+  dbPath = path.join(dbDir, 'gestao-obras.db');
+  
+  // Criar diretório se não existir
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+  
+  // Copiar banco de dados inicial se não existir
+  if (!fs.existsSync(dbPath)) {
+    const sourceDb = path.join(__dirname, 'data', 'gestao-obras.db');
+    if (fs.existsSync(sourceDb)) {
+      console.log('📦 Copiando banco de dados inicial...');
+      fs.copyFileSync(sourceDb, dbPath);
+      console.log('✅ Banco de dados copiado para:', dbPath);
+    }
+  }
+} else {
+  // Em desenvolvimento, usar pasta local
+  dbDir = path.join(__dirname, 'data');
+  dbPath = path.join(dbDir, 'gestao-obras.db');
+  
+  // Criar diretório se não existir
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+}
+
+console.log('📍 Caminho do banco de dados:', dbPath);
 
 // Inicializar banco de dados
 const db = new Database(dbPath, { verbose: console.log });

@@ -8,4 +8,14 @@ export default defineConfig({
     host: true, // Expõe na rede local
     port: 5173,
   },
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
+    // Otimizações para Electron
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
 });

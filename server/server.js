@@ -1,4 +1,10 @@
-require('dotenv').config();
+// Carrega variáveis de ambiente via dotenv quando disponível (dev)
+try {
+  require('dotenv').config();
+  console.log('✅ dotenv carregado');
+} catch (err) {
+  console.log('ℹ️ dotenv não encontrado, usando variáveis padrão');
+}
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

@@ -33,6 +33,7 @@ function App() {
     addAgreement,
     deleteAgreement,
     addEmployee,
+    updateEmployee,
     deleteEmployee,
   } = useDataManagement();
 
@@ -134,6 +135,7 @@ function App() {
               employees={employees}
               isSubmitting={isSubmitting}
               onAddEmployee={addEmployee}
+              onUpdateEmployee={updateEmployee}
               onDeleteEmployee={deleteEmployee}
             />
           )}
